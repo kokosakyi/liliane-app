@@ -59,10 +59,10 @@ function Addition({ difficulty, onBack }) {
     return (
       <div className="completion-screen">
         <h2 className="title">All Done!</h2>
-        <div className="score-display" style={{ fontSize: '2rem', marginBottom: '30px' }}>
+        <div className="score-display" style={{ fontSize: '1.5rem', marginBottom: '15px' }}>
           You got {score} out of {questions.length} correct!
         </div>
-        <div className="feedback-icon" style={{ fontSize: '5rem', marginBottom: '20px' }}>
+        <div className="feedback-icon" style={{ fontSize: '4rem', marginBottom: '15px' }}>
           {score === questions.length ? '🏆' : score >= questions.length / 2 ? '⭐' : '💪'}
         </div>
         <div className="section-buttons">
