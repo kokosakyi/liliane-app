@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import Question from './Question'
 import MultipleChoice from './MultipleChoice'
-import NumberInput from './NumberInput'
 import Feedback from './Feedback'
 import { generateQuestionBatch } from '../utils/questionGenerator'
 
@@ -115,18 +114,11 @@ function StoryProblems({ difficulty, onBack }) {
       <Question question={currentQuestion} showVisuals={difficulty <= 2} />
 
       {/* Answer input */}
-      {currentQuestion.inputType === 'multiple' ? (
-        <MultipleChoice
-          choices={currentQuestion.choices}
-          onSelect={handleAnswer}
-          disabled={feedback !== null}
-        />
-      ) : (
-        <NumberInput
-          onSubmit={handleAnswer}
-          disabled={feedback !== null}
-        />
-      )}
+      <MultipleChoice
+        choices={currentQuestion.choices}
+        onSelect={handleAnswer}
+        disabled={feedback !== null}
+      />
 
       {/* Feedback overlay */}
       {feedback && (

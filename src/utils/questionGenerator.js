@@ -90,7 +90,7 @@ export function generateAdditionQuestion(difficulty) {
     expression: `${a} + ${b} = ?`,
     visualItem: item.emoji,
     itemName: item.name,
-    inputType: Math.random() > 0.5 ? 'multiple' : 'typing'
+    inputType: 'multiple'
   }
 }
 
@@ -111,7 +111,7 @@ export function generateSubtractionQuestion(difficulty) {
     expression: `${a} - ${b} = ?`,
     visualItem: item.emoji,
     itemName: item.name,
-    inputType: Math.random() > 0.5 ? 'multiple' : 'typing'
+    inputType: 'multiple'
   }
 }
 
@@ -158,7 +158,7 @@ export function generateStoryProblem(difficulty) {
     items: item.name,
     visualItem: item.emoji, // Now matches the story item!
     itemName: item.name,
-    inputType: Math.random() > 0.5 ? 'multiple' : 'typing'
+    inputType: 'multiple'
   }
 }
 
