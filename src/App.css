@@ -1211,3 +1211,470 @@ body {
     padding: 10px 18px;
   }
 }
+
+/* ==================== COUNTRIES SECTION ==================== */
+
+/* Countries section container */
+.countries-section,
+.country-learning,
+.flag-quiz {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mode selection screen */
+.mode-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.mode-btn {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 25px 30px;
+}
+
+.mode-icon {
+  font-size: 2.5rem;
+}
+
+.mode-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.mode-desc {
+  font-size: 0.95rem;
+  opacity: 0.8;
+}
+
+/* Continent filter buttons */
+.continent-filter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.continent-btn {
+  font-family: var(--font-playful);
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  border: 2px solid var(--chalk-faded);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--chalk-white);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.continent-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.continent-btn.active {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: #1a4a5a;
+}
+
+/* Country card */
+.country-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 25px;
+  text-align: center;
+  animation: slideInBounce 0.4s ease-out;
+}
+
+.country-card-large {
+  max-width: 350px;
+  margin: 0 auto;
+}
+
+.country-card-small {
+  max-width: 200px;
+  padding: 15px;
+}
+
+.country-flag-container {
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.country-flag {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.country-info {
+  color: var(--chalk-white);
+}
+
+.country-name {
+  font-family: var(--font-playful);
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.country-capital {
+  font-family: var(--font-chalk);
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  color: var(--chalk-faded);
+}
+
+.capital-label {
+  color: var(--accent-yellow);
+  font-weight: 600;
+}
+
+.continent-badge {
+  display: inline-block;
+  font-size: 0.85rem;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-weight: 600;
+}
+
+.continent-africa { background: var(--accent-orange); color: #5a3a1a; }
+.continent-asia { background: var(--accent-pink); color: #6a2a2c; }
+.continent-europe { background: var(--accent-blue); color: #1a4a5a; }
+.continent-north-america { background: var(--accent-green); color: #1a5a2a; }
+.continent-south-america { background: var(--accent-yellow); color: #5a4a00; }
+.continent-oceania { background: var(--accent-purple); color: #3a2a5a; }
+.continent-antarctica { background: #b0e0e6; color: #2a4a5a; }
+
+/* Flashcard navigation */
+.flashcard-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin: 15px 0;
+  flex: 1;
+}
+
+.nav-arrow {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--chalk-white);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-arrow:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.nav-arrow:active {
+  transform: scale(0.95);
+}
+
+/* Learning progress */
+.learning-progress {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.progress-text {
+  font-family: var(--font-playful);
+  font-size: 1.1rem;
+  color: var(--accent-yellow);
+}
+
+/* Quiz setup screen */
+.quiz-setup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.setup-section {
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.setup-label {
+  font-family: var(--font-playful);
+  font-size: 1.2rem;
+  color: var(--chalk-white);
+  margin-bottom: 12px;
+}
+
+.quiz-type-selector {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.quiz-type-btn {
+  font-family: var(--font-playful);
+  font-size: 1.1rem;
+  padding: 15px 20px;
+  border: 2px solid var(--chalk-faded);
+  border-radius: 15px;
+  background: transparent;
+  color: var(--chalk-white);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  min-width: 140px;
+}
+
+.quiz-type-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.quiz-type-btn.active {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+  color: #1a5a2a;
+}
+
+.quiz-type-desc {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.btn-large {
+  font-size: 1.5rem;
+  padding: 18px 40px;
+  margin-top: 10px;
+}
+
+/* Quiz question display */
+.quiz-question {
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.question-prompt {
+  font-family: var(--font-chalk);
+  font-size: 1.4rem;
+  color: var(--chalk-white);
+  margin-bottom: 20px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.question-prompt strong {
+  color: var(--accent-yellow);
+}
+
+.quiz-flag-display {
+  background: white;
+  border-radius: 15px;
+  padding: 15px;
+  margin: 0 auto 25px;
+  max-width: 280px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.quiz-flag {
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.quiz-choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.quiz-choice-btn {
+  font-size: 1.1rem;
+  padding: 15px 12px;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+.quiz-choice-btn:nth-child(1) { background: var(--accent-yellow); color: #5a4a00; }
+.quiz-choice-btn:nth-child(2) { background: var(--accent-pink); color: #6a2a2c; }
+.quiz-choice-btn:nth-child(3) { background: var(--accent-blue); color: #1a4a5a; }
+.quiz-choice-btn:nth-child(4) { background: var(--accent-green); color: #1a5a2a; }
+
+/* Flag choices for name-to-flag quiz */
+.quiz-flag-choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.flag-choice-btn {
+  background: white;
+  border: 4px solid transparent;
+  border-radius: 15px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.flag-choice-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  border-color: var(--accent-yellow);
+}
+
+.flag-choice-btn:active {
+  transform: translateY(2px);
+}
+
+.flag-choice-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.flag-choice-img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+/* Mobile responsive for countries */
+@media (max-width: 600px) {
+  .mode-btn {
+    padding: 20px 25px;
+  }
+  
+  .mode-icon {
+    font-size: 2rem;
+  }
+  
+  .mode-title {
+    font-size: 1.3rem;
+  }
+  
+  .continent-filter {
+    gap: 6px;
+  }
+  
+  .continent-btn {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+  
+  .country-card {
+    padding: 20px;
+  }
+  
+  .country-name {
+    font-size: 1.4rem;
+  }
+  
+  .country-capital {
+    font-size: 1.1rem;
+  }
+  
+  .nav-arrow {
+    width: 45px;
+    height: 45px;
+    font-size: 2rem;
+  }
+  
+  .flashcard-container {
+    gap: 10px;
+  }
+  
+  .quiz-type-btn {
+    font-size: 1rem;
+    padding: 12px 15px;
+    min-width: 120px;
+  }
+  
+  .quiz-flag-display {
+    max-width: 220px;
+    padding: 12px;
+  }
+  
+  .quiz-choices {
+    max-width: 100%;
+    gap: 10px;
+  }
+  
+  .quiz-choice-btn {
+    font-size: 1rem;
+    padding: 12px 10px;
+  }
+  
+  .quiz-flag-choices {
+    max-width: 100%;
+    gap: 10px;
+  }
+  
+  .flag-choice-btn {
+    padding: 8px;
+  }
+  
+  .question-prompt {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .mode-btn {
+    padding: 15px 20px;
+  }
+  
+  .mode-icon {
+    font-size: 1.8rem;
+  }
+  
+  .quiz-type-selector {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .quiz-type-btn {
+    width: 100%;
+    max-width: 200px;
+  }
+}

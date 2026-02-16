@@ -54,6 +54,14 @@ function Home({ onSelectSection, difficulty, onDifficultyChange }) {
           <span className="icon">📖</span>
           Story Problems
         </button>
+
+        <button 
+          className="btn btn-green section-btn"
+          onClick={() => onSelectSection('countries')}
+        >
+          <span className="icon">🌍</span>
+          Countries
+        </button>
       </div>
     </div>
   )
