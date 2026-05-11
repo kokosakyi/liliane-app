@@ -4,6 +4,7 @@ import Addition from './components/Addition'
 import Subtraction from './components/Subtraction'
 import StoryProblems from './components/StoryProblems'
 import Countries from './components/Countries'
+import Spelling from './components/Spelling'
 
 function App() {
   const [currentSection, setCurrentSection] = useState('home')
@@ -21,6 +22,8 @@ function App() {
         return <StoryProblems difficulty={difficulty} onBack={goHome} />
       case 'countries':
         return <Countries onBack={goHome} />
+      case 'spelling':
+        return <Spelling onBack={goHome} />
       default:
         return (
           <Home 
