@@ -1,5 +1,5 @@
 // Import all flag SVGs using Vite's glob import
-const flagModules = import.meta.glob('../assets/flags/*.svg', { eager: true, as: 'url' })
+const flagModules = import.meta.glob('../assets/flags/*.svg', { eager: true, query: '?url', import: 'default' })
 
 // Create a map of flag filename to URL
 const flagMap = {}
