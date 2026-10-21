@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { STUDY_BUDDIES } from '../utils/curriculumData'
 import { speakText } from '../utils/soundManager'
 
@@ -9,13 +10,27 @@ function StudyBuddy({
   onToggleHint,
   compact = false,
 }) {
+  const [imgErr, setImgErr] = useState(false)
   const buddy = STUDY_BUDDIES.find((b) => b.id === buddyId) || STUDY_BUDDIES[0]
   const displayMessage = showHint && hintText ? hintText : message || buddy.greeting
 
   return (
-    <div className={`study-buddy-bar ${compact ? 'buddy-compact' : ''} ${showHint ? 'buddy-hint-active' : ''}`}>
+    <div
+      className={`study-buddy-bar ${compact ? 'buddy-compact' : ''} ${
+        showHint ? 'buddy-hint-active' : ''
+      }`}
+    >
       <div className="buddy-avatar" title={buddy.name}>
-        <span className="buddy-emoji">{buddy.emoji}</span>
+        {buddy.avatar && !imgErr ? (
+          <img
+            src={buddy.avatar}
+            alt={buddy.name}
+            className="buddy-avatar-img"
+            onError={() => setImgErr(true)}
+          />
+        ) : (
+          <span className="buddy-emoji">{buddy.emoji}</span>
+        )}
       </div>
 
       <div className="buddy-bubble">
@@ -37,7 +52,9 @@ function StudyBuddy({
         {hintText && onToggleHint && (
           <button
             type="button"
-            className={`btn btn-small buddy-hint-btn ${showHint ? 'btn-yellow' : 'btn-purple'}`}
+            className={`btn btn-small buddy-hint-btn ${
+              showHint ? 'btn-yellow' : 'btn-purple'
+            }`}
             onClick={onToggleHint}
           >
             💡 {showHint ? 'Hide Hint' : 'Hint'}

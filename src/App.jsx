@@ -9,63 +9,136 @@ import AdventureMap from './components/AdventureMap'
 import SkillSession from './components/SkillSession'
 import StickerBook from './components/StickerBook'
 import ParentCorner from './components/ParentCorner'
-import { MATH_TRACK, READING_TRACK } from './utils/curriculumData'
+import ProfilePicker from './components/ProfilePicker'
+import { MATH_TRACK, READING_TRACK, STUDY_BUDDIES } from './utils/curriculumData'
 import {
-  DEFAULT_STATE,
+  createProfile,
+  getActiveProfile,
   getCurrentFrontierNodes,
   getTotalStars,
   getUnlockedStickers,
-  loadAppState,
+  loadRootState,
   recordBonusSessionCompletion,
   recordNodeCompletion,
-  saveAppState,
+  saveRootState,
 } from './utils/storage'
 import { playSfx } from './utils/soundManager'
 
 function App() {
-  const [appState, setAppState] = useState(() => loadAppState())
-  const [currentView, setCurrentView] = useState('map') // 'map' | 'daily' | 'library' | 'stickers' | 'skill' | 'addition' | 'subtraction' | 'story' | 'countries' | 'spelling'
+  const [rootState, setRootState] = useState(() => loadRootState())
+  // Launch on the "Who's Learning Today?" Profile Picker screen
+  const [currentView, setCurrentView] = useState('profiles')
   const [activeNodeId, setActiveNodeId] = useState('math-1')
-  const [difficulty, setDifficulty] = useState(1)
+  const [difficulty, setDifficulty] = useState(2)
   const [isParentOpen, setIsParentOpen] = useState(false)
 
   useEffect(() => {
-    saveAppState(appState)
-  }, [appState])
+    saveRootState(rootState)
+  }, [rootState])
 
-  const updateAppState = (patch) => {
-    setAppState((prev) => ({ ...prev, ...patch }))
+  const activeProfile = getActiveProfile(rootState)
+  const activeBuddy =
+    STUDY_BUDDIES.find((b) => b.id === activeProfile.buddyId) || STUDY_BUDDIES[0]
+
+  const updateActiveProfile = (patch) => {
+    setRootState((prev) => ({
+      ...prev,
+      profiles: prev.profiles.map((p) =>
+        p.id === activeProfile.id ? { ...p, ...patch } : p,
+      ),
+    }))
   }
 
-  const handleResetProgress = () => {
-    setAppState({
-      ...DEFAULT_STATE,
-      childName: appState.childName,
-      theme: appState.theme,
-      buddyId: appState.buddyId,
+  const handleSelectProfile = (profileId) => {
+    const chosen =
+      rootState.profiles.find((p) => p.id === profileId) || rootState.profiles[0]
+    setRootState((prev) => ({
+      ...prev,
+      activeProfileId: chosen.id,
+    }))
+    setDifficulty(chosen.selectedTier || 2)
+    setCurrentView('map')
+  }
+
+  const handleSaveProfile = (profileDraft) => {
+    setRootState((prev) => {
+      const exists = prev.profiles.some((p) => p.id === profileDraft.id)
+      const nextProfiles = exists
+        ? prev.profiles.map((p) =>
+            p.id === profileDraft.id
+              ? {
+                  ...p,
+                  childName: profileDraft.childName,
+                  buddyId: profileDraft.buddyId,
+                  selectedTier: profileDraft.selectedTier,
+                }
+              : p,
+          )
+        : [
+            ...prev.profiles,
+            createProfile({
+              id: profileDraft.id,
+              childName: profileDraft.childName,
+              buddyId: profileDraft.buddyId,
+              selectedTier: profileDraft.selectedTier,
+            }),
+          ]
+
+      return {
+        ...prev,
+        activeProfileId: profileDraft.id,
+        profiles: nextProfiles,
+      }
+    })
+  }
+
+  const handleDeleteProfile = (profileId) => {
+    setRootState((prev) => {
+      if (prev.profiles.length <= 1) return prev
+      const remaining = prev.profiles.filter((p) => p.id !== profileId)
+      const nextActiveId =
+        prev.activeProfileId === profileId ? remaining[0].id : prev.activeProfileId
+      return {
+        ...prev,
+        activeProfileId: nextActiveId,
+        profiles: remaining,
+      }
+    })
+  }
+
+  const handleResetProfileProgress = () => {
+    updateActiveProfile({
+      bonusStars: 0,
+      streak: { count: 0, lastCompletedDate: null },
+      nodeProgress: {},
     })
   }
 
   const handleCompleteNode = (nodeId, firstTryCorrect, totalQuestions) => {
-    const prevStarsTotal = getTotalStars(appState)
+    const prevStarsTotal = getTotalStars(activeProfile)
     const prevUnlockedIds = new Set(
       getUnlockedStickers(prevStarsTotal).map((s) => s.id),
     )
 
-    const { nextState, earnedStars } = recordNodeCompletion(
-      appState,
+    const { nextProfile, earnedStars } = recordNodeCompletion(
+      activeProfile,
       nodeId,
       firstTryCorrect,
       totalQuestions,
     )
-    setAppState(nextState)
 
-    const newStarsTotal = getTotalStars(nextState)
+    setRootState((prev) => ({
+      ...prev,
+      profiles: prev.profiles.map((p) =>
+        p.id === activeProfile.id ? nextProfile : p,
+      ),
+    }))
+
+    const newStarsTotal = getTotalStars(nextProfile)
     const newlyUnlockedStickers = getUnlockedStickers(newStarsTotal).filter(
       (s) => !prevUnlockedIds.has(s.id),
     )
 
-    // Find next sequential node in the same track
     const track = nodeId.startsWith('math-') ? MATH_TRACK : READING_TRACK
     const idx = track.findIndex((n) => n.id === nodeId)
     const nextNode = idx >= 0 && idx < track.length - 1 ? track[idx + 1] : null
@@ -78,15 +151,21 @@ function App() {
   }
 
   const handleCompleteDaily = () => {
-    const prevStarsTotal = getTotalStars(appState)
+    const prevStarsTotal = getTotalStars(activeProfile)
     const prevUnlockedIds = new Set(
       getUnlockedStickers(prevStarsTotal).map((s) => s.id),
     )
 
-    const nextState = recordBonusSessionCompletion(appState, 3)
-    setAppState(nextState)
+    const nextProfile = recordBonusSessionCompletion(activeProfile, 3)
 
-    const newStarsTotal = getTotalStars(nextState)
+    setRootState((prev) => ({
+      ...prev,
+      profiles: prev.profiles.map((p) =>
+        p.id === activeProfile.id ? nextProfile : p,
+      ),
+    }))
+
+    const newStarsTotal = getTotalStars(nextProfile)
     const newlyUnlockedStickers = getUnlockedStickers(newStarsTotal).filter(
       (s) => !prevUnlockedIds.has(s.id),
     )
@@ -97,23 +176,48 @@ function App() {
   }
 
   const handleEarnBonusStars = (starsCount = 2) => {
-    setAppState((prev) => recordBonusSessionCompletion(prev, starsCount))
+    const nextProfile = recordBonusSessionCompletion(activeProfile, starsCount)
+    setRootState((prev) => ({
+      ...prev,
+      profiles: prev.profiles.map((p) =>
+        p.id === activeProfile.id ? nextProfile : p,
+      ),
+    }))
   }
 
-  const totalStars = getTotalStars(appState)
-  const { mathNode, readingNode } = getCurrentFrontierNodes(appState)
+  const totalStars = getTotalStars(activeProfile)
+  const { mathNode, readingNode } = getCurrentFrontierNodes(activeProfile)
 
   const renderMainContent = () => {
     switch (currentView) {
+      case 'profiles':
+        return (
+          <ProfilePicker
+            profiles={rootState.profiles}
+            activeProfileId={activeProfile.id}
+            soundEnabled={rootState.soundEnabled}
+            onSelectProfile={handleSelectProfile}
+            onSaveProfile={handleSaveProfile}
+            onDeleteProfile={handleDeleteProfile}
+          />
+        )
+
       case 'skill':
         return (
           <SkillSession
-            key={activeNodeId}
+            key={`${activeProfile.id}-${activeNodeId}`}
             nodeId={activeNodeId}
-            buddyId={appState.buddyId}
-            soundEnabled={appState.soundEnabled}
+            profileId={activeProfile.id}
+            buddyId={activeProfile.buddyId}
+            soundEnabled={rootState.soundEnabled}
             onCompleteNode={handleCompleteNode}
             onSelectNextNode={(nextId) => {
+              const targetNode = [...MATH_TRACK, ...READING_TRACK].find(
+                (n) => n.id === nextId,
+              )
+              if (targetNode && targetNode.tier !== activeProfile.selectedTier) {
+                updateActiveProfile({ selectedTier: targetNode.tier })
+              }
               setActiveNodeId(nextId)
               setCurrentView('skill')
             }}
@@ -124,12 +228,13 @@ function App() {
       case 'daily':
         return (
           <SkillSession
-            key="daily-practice"
+            key={`${activeProfile.id}-daily`}
             isDailyPractice
+            profileId={activeProfile.id}
             mathFrontierId={mathNode.id}
             readingFrontierId={readingNode.id}
-            buddyId={appState.buddyId}
-            soundEnabled={appState.soundEnabled}
+            buddyId={activeProfile.buddyId}
+            soundEnabled={rootState.soundEnabled}
             onCompleteDaily={handleCompleteDaily}
             onBack={() => setCurrentView('map')}
           />
@@ -138,7 +243,7 @@ function App() {
       case 'stickers':
         return (
           <StickerBook
-            appState={appState}
+            appState={activeProfile}
             onBack={() => setCurrentView('map')}
           />
         )
@@ -183,7 +288,7 @@ function App() {
       case 'spelling':
         return (
           <Spelling
-            soundEnabled={appState.soundEnabled}
+            soundEnabled={rootState.soundEnabled}
             onEarnBonusStars={handleEarnBonusStars}
             onBack={() => setCurrentView('library')}
           />
@@ -193,7 +298,12 @@ function App() {
       default:
         return (
           <AdventureMap
-            appState={appState}
+            profile={activeProfile}
+            soundEnabled={rootState.soundEnabled}
+            onSelectTier={(tierId) => {
+              updateActiveProfile({ selectedTier: tierId })
+              setDifficulty(tierId)
+            }}
             onSelectNode={(id) => {
               setActiveNodeId(id)
               setCurrentView('skill')
@@ -206,16 +316,38 @@ function App() {
   }
 
   return (
-    <div className={`app theme-${appState.theme}`}>
+    <div className={`app theme-${rootState.theme}`}>
       <div className="blackboard">
         {/* Top Navigation & Status Bar */}
         <header className="top-hud-bar">
           <div className="hud-nav-tabs">
             <button
               type="button"
-              className={`hud-tab-btn ${currentView === 'map' || currentView === 'skill' ? 'active' : ''}`}
+              className={`hud-learner-switch ${
+                currentView === 'profiles' ? 'active' : ''
+              }`}
               onClick={() => {
-                playSfx('tap', appState.soundEnabled)
+                playSfx('tap', rootState.soundEnabled)
+                setCurrentView('profiles')
+              }}
+              title="Switch Learner Profile"
+            >
+              <img
+                src={activeBuddy.avatar}
+                alt={activeBuddy.name}
+                className="hud-learner-avatar"
+              />
+              <span>{activeProfile.childName}</span>
+              <span className="hud-caret">▾</span>
+            </button>
+
+            <button
+              type="button"
+              className={`hud-tab-btn ${
+                currentView === 'map' || currentView === 'skill' ? 'active' : ''
+              }`}
+              onClick={() => {
+                playSfx('tap', rootState.soundEnabled)
                 setCurrentView('map')
               }}
             >
@@ -226,7 +358,7 @@ function App() {
               type="button"
               className={`hud-tab-btn ${currentView === 'daily' ? 'active' : ''}`}
               onClick={() => {
-                playSfx('tap', appState.soundEnabled)
+                playSfx('tap', rootState.soundEnabled)
                 setCurrentView('daily')
               }}
             >
@@ -243,7 +375,7 @@ function App() {
                   : ''
               }`}
               onClick={() => {
-                playSfx('tap', appState.soundEnabled)
+                playSfx('tap', rootState.soundEnabled)
                 setCurrentView('library')
               }}
             >
@@ -254,7 +386,7 @@ function App() {
               type="button"
               className={`hud-tab-btn ${currentView === 'stickers' ? 'active' : ''}`}
               onClick={() => {
-                playSfx('tap', appState.soundEnabled)
+                playSfx('tap', rootState.soundEnabled)
                 setCurrentView('stickers')
               }}
             >
@@ -264,7 +396,7 @@ function App() {
 
           <div className="hud-status-pills">
             <div className="hud-pill hud-streak" title="Daily Streak">
-              🔥 {appState.streak?.count || 0}
+              🔥 {activeProfile.streak?.count || 0}
             </div>
 
             <button
@@ -280,28 +412,52 @@ function App() {
               type="button"
               className="hud-icon-btn"
               onClick={() =>
-                updateAppState({
-                  theme: appState.theme === 'blackboard' ? 'daylight' : 'blackboard',
-                })
+                setRootState((prev) => ({
+                  ...prev,
+                  theme: prev.theme === 'blackboard' ? 'daylight' : 'blackboard',
+                }))
               }
               title={
-                appState.theme === 'blackboard'
+                rootState.theme === 'blackboard'
                   ? 'Switch to Storybook Daylight Theme'
                   : 'Switch to Classic Blackboard Theme'
               }
               aria-label="Toggle visual theme"
             >
-              {appState.theme === 'blackboard' ? '☀️' : '🖍️'}
+              {rootState.theme === 'blackboard' ? '☀️' : '🖍️'}
             </button>
 
             <button
               type="button"
               className="hud-icon-btn"
-              onClick={() => updateAppState({ soundEnabled: !appState.soundEnabled })}
-              title={appState.soundEnabled ? 'Sound Effects: ON' : 'Sound Effects: Muted'}
+              onClick={() =>
+                setRootState((prev) => ({
+                  ...prev,
+                  soundEnabled: !prev.soundEnabled,
+                }))
+              }
+              title={
+                rootState.soundEnabled ? 'Sound Effects: ON' : 'Sound Effects: Muted'
+              }
               aria-label="Toggle sound effects"
             >
-              {appState.soundEnabled ? '🔔' : '🔕'}
+              {rootState.soundEnabled ? '🔔' : '🔕'}
+            </button>
+
+            <button
+              type="button"
+              className="hud-icon-btn"
+              onClick={() => {
+                if (!document.fullscreenElement) {
+                  document.documentElement.requestFullscreen?.().catch(() => {})
+                } else {
+                  document.exitFullscreen?.().catch(() => {})
+                }
+              }}
+              title="Toggle Full Screen"
+              aria-label="Toggle full screen"
+            >
+              ⛶
             </button>
 
             <button
@@ -322,9 +478,10 @@ function App() {
       <ParentCorner
         isOpen={isParentOpen}
         onClose={() => setIsParentOpen(false)}
-        appState={appState}
-        onUpdateState={updateAppState}
-        onResetProgress={handleResetProgress}
+        profile={activeProfile}
+        onUpdateProfile={updateActiveProfile}
+        onResetProfileProgress={handleResetProfileProgress}
+        onOpenProfilePicker={() => setCurrentView('profiles')}
       />
     </div>
   )

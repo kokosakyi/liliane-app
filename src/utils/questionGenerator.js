@@ -1,153 +1,193 @@
-// Item definitions with matching emoji icons
-const itemDefinitions = [
-  { name: 'apples', emoji: '🍎' },
-  { name: 'cookies', emoji: '🍪' },
-  { name: 'stars', emoji: '⭐' },
-  { name: 'flowers', emoji: '🌸' },
-  { name: 'butterflies', emoji: '🦋' },
-  { name: 'balloons', emoji: '🎈' },
-  { name: 'birds', emoji: '🐦' },
-  { name: 'fish', emoji: '🐟' },
-  { name: 'candies', emoji: '🍬' },
-  { name: 'toys', emoji: '🧸' },
-  { name: 'dogs', emoji: '🐶' },
-  { name: 'cats', emoji: '🐱' },
-  { name: 'strawberries', emoji: '🍓' },
-  { name: 'cupcakes', emoji: '🧁' },
-  { name: 'hearts', emoji: '❤️' },
-  { name: 'bunnies', emoji: '🐰' },
-  { name: 'ducks', emoji: '🦆' },
-  { name: 'frogs', emoji: '🐸' },
+import {
+  generateSmartMathChoices,
+  hasSeenRecently,
+  randomInt,
+  recordSeenSignature,
+  shuffle,
+} from './randomEngine'
+
+// Item definitions with matching emoji icons & scene categories
+export const itemDefinitions = [
+  { name: 'apples', emoji: '🍎', scene: '/assets/nano/scene-nature.png' },
+  { name: 'cookies', emoji: '🍪', scene: '/assets/nano/world-tier2-treehouse.png' },
+  { name: 'stars', emoji: '⭐', scene: '/assets/nano/scene-space.png' },
+  { name: 'flowers', emoji: '🌸', scene: '/assets/nano/world-tier1-meadow.png' },
+  { name: 'butterflies', emoji: '🦋', scene: '/assets/nano/world-tier1-meadow.png' },
+  { name: 'balloons', emoji: '🎈', scene: '/assets/nano/world-tier2-treehouse.png' },
+  { name: 'birds', emoji: '🐦', scene: '/assets/nano/scene-nature.png' },
+  { name: 'fish', emoji: '🐟', scene: '/assets/nano/scene-ocean.png' },
+  { name: 'candies', emoji: '🍬', scene: '/assets/nano/world-tier2-treehouse.png' },
+  { name: 'toys', emoji: '🧸', scene: '/assets/nano/world-tier2-treehouse.png' },
+  { name: 'puppies', emoji: '🐶', scene: '/assets/nano/world-tier1-meadow.png' },
+  { name: 'kittens', emoji: '🐱', scene: '/assets/nano/world-tier1-meadow.png' },
+  { name: 'strawberries', emoji: '🍓', scene: '/assets/nano/world-tier1-meadow.png' },
+  { name: 'cupcakes', emoji: '🧁', scene: '/assets/nano/world-tier2-treehouse.png' },
+  { name: 'sea shells', emoji: '🐚', scene: '/assets/nano/scene-ocean.png' },
+  { name: 'bunnies', emoji: '🐰', scene: '/assets/nano/world-tier1-meadow.png' },
+  { name: 'ducks', emoji: '🦆', scene: '/assets/nano/world-tier3-island.png' },
+  { name: 'frogs', emoji: '🐸', scene: '/assets/nano/scene-nature.png' },
+  { name: 'dinosaur eggs', emoji: '🦕', scene: '/assets/nano/scene-dino.png' },
+  { name: 'rockets', emoji: '🚀', scene: '/assets/nano/scene-space.png' },
+  { name: 'crystals', emoji: '💎', scene: '/assets/nano/world-tier3-island.png' },
+  { name: 'sea turtles', emoji: '🐢', scene: '/assets/nano/scene-ocean.png' },
 ]
 
-// Visual items for counting (standalone addition/subtraction)
-const visualItems = itemDefinitions.map(item => item.emoji)
-
-// Story problem templates
 const storyTemplates = {
   addition: [
     { template: '{name} has {a} {items}. {giver} gives {name} {b} more. How many {items} does {name} have now?', giver: 'Mom' },
-    { template: 'There are {a} {items} on the table. {name} puts {b} more. How many {items} are there now?', giver: null },
-    { template: '{name} sees {a} {items}. Then {name} finds {b} more. How many {items} did {name} find in total?', giver: null },
-    { template: '{name} has {a} {items} in one hand and {b} {items} in the other hand. How many {items} does {name} have?', giver: null },
-    { template: 'There are {a} {items} in the garden. {b} more {items} come. How many {items} are in the garden now?', giver: null },
+    { template: 'There are {a} {items} on the table. {name} puts {b} more. How many {items} are there in all?', giver: null },
+    { template: '{name} spots {a} {items} in the morning and {b} more in the afternoon. How many {items} did {name} see altogether?', giver: null },
+    { template: '{name} has {a} {items} in one basket and {b} {items} in another basket. What is the total number of {items}?', giver: null },
+    { template: 'There are {a} {items} in the garden. {b} more {items} join them. How many {items} are in the garden now?', giver: null },
+    { template: 'During an expedition, {name} collected {a} {items} on Monday and {b} {items} on Tuesday. How many {items} did {name} collect?', giver: null },
+    { template: '{giver} baked {a} {items} first, and then baked {b} more for the party. How many {items} were baked in total?', giver: 'Grandma' },
   ],
   subtraction: [
-    { template: '{name} has {a} {items}. {name} gives {b} to a friend. How many {items} does {name} have left?', giver: null },
-    { template: 'There are {a} {items}. {b} {items} go away. How many {items} are left?', giver: null },
-    { template: '{name} has {a} {items}. {name} eats {b} of them. How many {items} are left?', giver: null },
-    { template: 'There are {a} {items} on the tree. {b} fall down. How many {items} are still on the tree?', giver: null },
-    { template: '{name} sees {a} {items}. {b} {items} hide. How many {items} can {name} still see?', giver: null },
-  ]
+    { template: '{name} has {a} {items}. {name} shares {b} with a friend. How many {items} does {name} have left?', giver: null },
+    { template: 'There are {a} {items}. {b} {items} go away. How many {items} remain?', giver: null },
+    { template: '{name} started with {a} {items} and used {b} of them. How many {items} are left over?', giver: null },
+    { template: 'There are {a} {items} on the branch. {b} hop down. How many {items} are still on the branch?', giver: null },
+    { template: '{name} counted {a} {items}, but {b} {items} hid behind a rock. How many can {name} still see?', giver: null },
+    { template: 'A treasure chest had {a} {items}. {name} took out {b} {items}. How many {items} are still inside the chest?', giver: null },
+  ],
+  multiStep: [
+    {
+      template: '{name} had {a} {items}, found {b} more, and then gave {c} to a friend. How many {items} does {name} have now?',
+      compute: (a, b, c) => a + b - c,
+    },
+    {
+      template: 'There are {a} boxes with {b} {items} in each box, plus {c} extra {items} on the shelf. How many {items} are there in all?',
+      compute: (a, b, c) => a * b + c,
+    },
+  ],
 }
 
-// Kid-friendly names
-const names = ['Lily', 'Emma', 'Sam', 'Max', 'Mia', 'Leo', 'Zoe', 'Ben']
+const names = ['Liliane', 'Emma', 'Sam', 'Max', 'Mia', 'Leo', 'Zoe', 'Noah', 'Maya', 'Lucas']
 
-// Get max number based on difficulty
-function getMaxNumber(difficulty) {
+export function getMaxNumber(difficulty) {
   switch (difficulty) {
-    case 1: return 5   // Age 4: 0-5
-    case 2: return 10  // Kindergarten: 0-10
-    case 3: return 20  // Grade 1-2: 0-20
-    default: return 5
+    case 1:
+      return 5 // Tier 1: Pre-K (0-5)
+    case 2:
+      return 10 // Tier 2: Kindergarten (0-10)
+    case 3:
+      return 50 // Tier 3: Grades 1-2 (0-50)
+    case 4:
+      return 100 // Tier 4: Grades 3-4 (0-100)
+    default:
+      return 10
   }
 }
 
-// Generate random number within range
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
-// Shuffle array
-function shuffle(array) {
-  const newArray = [...array]
-  for (let i = newArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [newArray[i], newArray[j]] = [newArray[j], newArray[i]]
-  }
-  return newArray
-}
-
-// Generate addition question
 export function generateAdditionQuestion(difficulty) {
   const max = getMaxNumber(difficulty)
-  // Ensure at least one number is >= 1 to avoid 0+0
-  const minFirst = 1
-  const a = randomInt(minFirst, max)
-  // Allow b to be 0 sometimes, but ensure we have meaningful problems
-  const maxB = Math.min(max - a, max)
-  const b = randomInt(0, maxB)
+  const minFirst = difficulty >= 3 ? 8 : 1
+  const a = randomInt(minFirst, Math.floor(max * 0.65))
+  const b = randomInt(difficulty >= 3 ? 5 : 1, max - a)
   const answer = a + b
-  
   const item = itemDefinitions[randomInt(0, itemDefinitions.length - 1)]
-  
+
+  // Vary the question angle on higher difficulties
+  const useMissingAngle = difficulty >= 3 && Math.random() < 0.3
+  const expression = useMissingAngle ? `${a} + ? = ${answer}` : `${a} + ${b} = ?`
+  const expectedAnswer = useMissingAngle ? b : answer
+
   return {
     type: 'addition',
     num1: a,
     num2: b,
-    answer,
-    expression: `${a} + ${b} = ?`,
+    answer: expectedAnswer,
+    expression,
     visualItem: item.emoji,
+    sceneImage: item.scene,
     itemName: item.name,
-    inputType: 'multiple'
+    inputType: 'multiple',
   }
 }
 
-// Generate subtraction question
 export function generateSubtractionQuestion(difficulty) {
   const max = getMaxNumber(difficulty)
-  const a = randomInt(2, max) // Start from 2 to have meaningful subtraction
-  const b = randomInt(1, a - 1) // Ensure we subtract at least 1 and result > 0
+  const a = randomInt(difficulty >= 3 ? 15 : 2, max)
+  const b = randomInt(difficulty >= 3 ? 4 : 1, a - 1)
   const answer = a - b
-  
   const item = itemDefinitions[randomInt(0, itemDefinitions.length - 1)]
-  
+
+  const useMissingAngle = difficulty >= 3 && Math.random() < 0.25
+  const expression = useMissingAngle ? `${a} - ? = ${answer}` : `${a} - ${b} = ?`
+  const expectedAnswer = useMissingAngle ? b : answer
+
   return {
     type: 'subtraction',
     num1: a,
     num2: b,
-    answer,
-    expression: `${a} - ${b} = ?`,
+    answer: expectedAnswer,
+    expression,
     visualItem: item.emoji,
+    sceneImage: item.scene,
     itemName: item.name,
-    inputType: 'multiple'
+    inputType: 'multiple',
   }
 }
 
-// Generate story problem
 export function generateStoryProblem(difficulty) {
-  const isAddition = Math.random() > 0.5
   const max = getMaxNumber(difficulty)
-  
+  const name = names[randomInt(0, names.length - 1)]
+  const item = itemDefinitions[randomInt(0, itemDefinitions.length - 1)]
+
+  // Tier 4 multi-step story option
+  if (difficulty >= 4 && Math.random() < 0.45) {
+    const isMult = Math.random() < 0.5
+    const tpl = storyTemplates.multiStep[isMult ? 1 : 0]
+    const a = isMult ? randomInt(2, 6) : randomInt(12, 30)
+    const b = isMult ? randomInt(3, 8) : randomInt(8, 20)
+    const c = isMult ? randomInt(2, 9) : randomInt(5, a + b - 5)
+    const answer = tpl.compute(a, b, c)
+    const story = tpl.template
+      .replace(/{name}/g, name)
+      .replace(/{a}/g, a)
+      .replace(/{b}/g, b)
+      .replace(/{c}/g, c)
+      .replace(/{items}/g, item.name)
+
+    return {
+      type: 'story',
+      operation: 'addition',
+      num1: a,
+      num2: b,
+      answer,
+      story,
+      items: item.name,
+      visualItem: item.emoji,
+      sceneImage: item.scene,
+      itemName: item.name,
+      inputType: 'multiple',
+    }
+  }
+
+  const isAddition = Math.random() > 0.5
   let a, b, answer
-  
+
   if (isAddition) {
-    // Ensure meaningful numbers (at least 1 each)
     const halfMax = Math.max(2, Math.floor(max / 2))
-    a = randomInt(1, halfMax)
-    b = randomInt(1, halfMax)
+    a = randomInt(difficulty >= 3 ? 6 : 1, halfMax)
+    b = randomInt(difficulty >= 3 ? 5 : 1, halfMax)
     answer = a + b
   } else {
-    a = randomInt(3, max) // Start higher for subtraction
-    b = randomInt(1, a - 1)
+    a = randomInt(difficulty >= 3 ? 14 : 3, max)
+    b = randomInt(difficulty >= 3 ? 4 : 1, a - 1)
     answer = a - b
   }
-  
+
   const templates = isAddition ? storyTemplates.addition : storyTemplates.subtraction
   const template = templates[randomInt(0, templates.length - 1)]
-  const name = names[randomInt(0, names.length - 1)]
-  
-  // Pick an item and use its matching emoji
-  const item = itemDefinitions[randomInt(0, itemDefinitions.length - 1)]
-  
+
   const story = template.template
     .replace(/{name}/g, name)
     .replace(/{a}/g, a)
     .replace(/{b}/g, b)
     .replace(/{items}/g, item.name)
-    .replace(/{giver}/g, template.giver || '')
-  
+    .replace(/{giver}/g, template.giver || 'Mom')
+
   return {
     type: 'story',
     operation: isAddition ? 'addition' : 'subtraction',
@@ -156,65 +196,57 @@ export function generateStoryProblem(difficulty) {
     answer,
     story,
     items: item.name,
-    visualItem: item.emoji, // Now matches the story item!
+    visualItem: item.emoji,
+    sceneImage: item.scene,
     itemName: item.name,
-    inputType: 'multiple'
+    inputType: 'multiple',
   }
 }
 
-// Generate multiple choice options
 export function generateChoices(correctAnswer, difficulty) {
-  const max = getMaxNumber(difficulty)
-  const choices = new Set([correctAnswer])
-  
-  // Generate wrong answers close to the correct one
-  while (choices.size < 4) {
-    let wrongAnswer
-    const offset = randomInt(1, 3)
-    
-    if (Math.random() > 0.5 && correctAnswer + offset <= max) {
-      wrongAnswer = correctAnswer + offset
-    } else if (correctAnswer - offset >= 0) {
-      wrongAnswer = correctAnswer - offset
-    } else {
-      wrongAnswer = correctAnswer + offset
-    }
-    
-    if (wrongAnswer >= 0 && wrongAnswer <= max) {
-      choices.add(wrongAnswer)
-    }
-  }
-  
-  return shuffle([...choices])
+  const max = Math.max(getMaxNumber(difficulty), correctAnswer + 10)
+  return generateSmartMathChoices(correctAnswer, { min: 0, max })
 }
 
-// Generate a batch of questions
 export function generateQuestionBatch(type, difficulty, count = 10) {
   const questions = []
-  
+  const roundSignatures = new Set()
+
   for (let i = 0; i < count; i++) {
     let question
-    
-    switch (type) {
-      case 'addition':
-        question = generateAdditionQuestion(difficulty)
-        break
-      case 'subtraction':
-        question = generateSubtractionQuestion(difficulty)
-        break
-      case 'story':
-        question = generateStoryProblem(difficulty)
-        break
-      default:
-        question = generateAdditionQuestion(difficulty)
-    }
-    
+    let attempts = 0
+    let sig = ''
+
+    do {
+      attempts++
+      switch (type) {
+        case 'addition':
+          question = generateAdditionQuestion(difficulty)
+          break
+        case 'subtraction':
+          question = generateSubtractionQuestion(difficulty)
+          break
+        case 'story':
+          question = generateStoryProblem(difficulty)
+          break
+        default:
+          question = generateAdditionQuestion(difficulty)
+      }
+      sig = `${question.type}-${question.expression || question.story}-${question.answer}`
+    } while (
+      attempts < 15 &&
+      (roundSignatures.has(sig) || hasSeenRecently(sig, 'freeplay'))
+    )
+
+    roundSignatures.add(sig)
+    recordSeenSignature(sig, 'freeplay')
+
     questions.push({
       ...question,
       id: i + 1,
-      choices: generateChoices(question.answer, difficulty)
+      choices: generateChoices(question.answer, difficulty),
     })
   }
-  
+
   return questions
 }

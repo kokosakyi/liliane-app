@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { MATH_TRACK, READING_TRACK, STUDY_BUDDIES } from '../utils/curriculumData'
+import { GRADE_TIERS, MATH_TRACK, READING_TRACK, STUDY_BUDDIES } from '../utils/curriculumData'
 import { getTotalStars } from '../utils/storage'
 
 function ParentCorner({
   isOpen,
   onClose,
-  appState,
-  onUpdateState,
-  onResetProgress,
+  profile,
+  onUpdateProfile,
+  onResetProfileProgress,
+  onOpenProfilePicker,
 }) {
   const dialogRef = useRef(null)
   const [confirmReset, setConfirmReset] = useState(false)
@@ -56,12 +57,14 @@ function ParentCorner({
     }
   }, [onClose])
 
-  const totalStars = getTotalStars(appState)
+  if (!profile) return null
+
+  const totalStars = getTotalStars(profile)
   const mathMasteredCount = MATH_TRACK.filter(
-    (n) => (appState.nodeProgress?.[n.id]?.stars || 0) >= 2,
+    (n) => (profile.nodeProgress?.[n.id]?.stars || 0) >= 2,
   ).length
   const readingMasteredCount = READING_TRACK.filter(
-    (n) => (appState.nodeProgress?.[n.id]?.stars || 0) >= 2,
+    (n) => (profile.nodeProgress?.[n.id]?.stars || 0) >= 2,
   ).length
 
   return (
@@ -74,15 +77,29 @@ function ParentCorner({
       <div className="parent-dialog-inner">
         <div className="parent-header">
           <h2 id="parentDialogTitle" className="parent-title">
-            ⚙️ Parent Corner & Progress Report
+            ⚙️ Parent Corner — {profile.childName}’s Report
           </h2>
-          <button
-            type="button"
-            className="btn btn-back btn-small"
-            onClick={() => dialogRef.current?.close()}
-          >
-            ✕ Close
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {onOpenProfilePicker && (
+              <button
+                type="button"
+                className="btn btn-yellow btn-small"
+                onClick={() => {
+                  dialogRef.current?.close()
+                  onOpenProfilePicker()
+                }}
+              >
+                👥 Switch / Manage Profiles
+              </button>
+            )}
+            <button
+              type="button"
+              className="btn btn-back btn-small"
+              onClick={() => dialogRef.current?.close()}
+            >
+              ✕ Close
+            </button>
+          </div>
         </div>
 
         {/* Summary Cards */}
@@ -92,20 +109,20 @@ function ParentCorner({
             <div className="stat-lbl">Total Stars</div>
           </div>
           <div className="parent-stat-card">
-            <div className="stat-val">🔥 {appState.streak?.count || 0}</div>
+            <div className="stat-val">🔥 {profile.streak?.count || 0}</div>
             <div className="stat-lbl">Day Streak</div>
           </div>
           <div className="parent-stat-card">
             <div className="stat-val">
               {mathMasteredCount}/{MATH_TRACK.length}
             </div>
-            <div className="stat-lbl">Math Levels</div>
+            <div className="stat-lbl">Math Skills</div>
           </div>
           <div className="parent-stat-card">
             <div className="stat-val">
               {readingMasteredCount}/{READING_TRACK.length}
             </div>
-            <div className="stat-lbl">Reading Levels</div>
+            <div className="stat-lbl">Reading Skills</div>
           </div>
         </div>
 
@@ -113,18 +130,34 @@ function ParentCorner({
         <div className="parent-settings-box">
           <div className="parent-setting-item">
             <label htmlFor="childNameInput" className="parent-label">
-              Child’s Name:
+              Learner’s Name:
             </label>
             <input
               id="childNameInput"
               type="text"
               className="parent-text-input"
-              value={appState.childName}
+              value={profile.childName}
               maxLength={20}
               onChange={(e) =>
-                onUpdateState({ childName: e.target.value || 'Liliane' })
+                onUpdateProfile({ childName: e.target.value || 'Learner' })
               }
             />
+          </div>
+
+          <div className="parent-setting-item">
+            <span className="parent-label">Active Grade Tier:</span>
+            <div className="buddy-picker-row">
+              {GRADE_TIERS.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  className={`buddy-pick-btn ${profile.selectedTier === t.id ? 'active' : ''}`}
+                  onClick={() => onUpdateProfile({ selectedTier: t.id })}
+                >
+                  <span>{t.shortLabel}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="parent-setting-item">
@@ -134,8 +167,8 @@ function ParentCorner({
                 <button
                   key={b.id}
                   type="button"
-                  className={`buddy-pick-btn ${appState.buddyId === b.id ? 'active' : ''}`}
-                  onClick={() => onUpdateState({ buddyId: b.id })}
+                  className={`buddy-pick-btn ${profile.buddyId === b.id ? 'active' : ''}`}
+                  onClick={() => onUpdateProfile({ buddyId: b.id })}
                 >
                   <span>{b.emoji}</span>
                   <span>{b.name}</span>
@@ -148,15 +181,15 @@ function ParentCorner({
             <div>
               <div className="parent-label">🔓 Unlock All Skill Levels (Free-Jump Mode)</div>
               <div className="parent-sublabel">
-                Allow jumping to any Math or Reading skill node without needing 2⭐ on prior steps.
+                Allow jumping to any Math or Reading skill node across all 4 tiers anytime.
               </div>
             </div>
             <button
               type="button"
-              className={`btn btn-small ${appState.freeJump ? 'btn-green' : 'btn-back'}`}
-              onClick={() => onUpdateState({ freeJump: !appState.freeJump })}
+              className={`btn btn-small ${profile.freeJump ? 'btn-green' : 'btn-back'}`}
+              onClick={() => onUpdateProfile({ freeJump: !profile.freeJump })}
             >
-              {appState.freeJump ? 'ON (All Unlocked)' : 'OFF (Sequential)'}
+              {profile.freeJump ? 'ON (All Unlocked)' : 'OFF (Sequential)'}
             </button>
           </div>
         </div>
@@ -164,10 +197,10 @@ function ParentCorner({
         {/* Skill Mastery Breakdown */}
         <div className="parent-tracks-columns">
           <div className="parent-track-col">
-            <h3 className="parent-col-title">🔢 Math Track Mastery</h3>
+            <h3 className="parent-col-title">🔢 Math Track (22 Skills)</h3>
             <div className="parent-node-list">
               {MATH_TRACK.map((node) => {
-                const prog = appState.nodeProgress?.[node.id]
+                const prog = profile.nodeProgress?.[node.id]
                 const stars = prog?.stars || 0
                 const acc =
                   prog?.totalQuestions > 0
@@ -175,7 +208,7 @@ function ParentCorner({
                     : null
                 return (
                   <div key={node.id} className="parent-node-row">
-                    <span className="p-node-badge">{node.badge}</span>
+                    <span className="p-node-badge">T{node.tier} {node.badge}</span>
                     <span className="p-node-name">{node.title}</span>
                     <span className="p-node-stars">
                       {'⭐'.repeat(stars)}
@@ -191,10 +224,10 @@ function ParentCorner({
           </div>
 
           <div className="parent-track-col">
-            <h3 className="parent-col-title">📖 Reading Track Mastery</h3>
+            <h3 className="parent-col-title">📖 Reading & Language Arts (16 Skills)</h3>
             <div className="parent-node-list">
               {READING_TRACK.map((node) => {
-                const prog = appState.nodeProgress?.[node.id]
+                const prog = profile.nodeProgress?.[node.id]
                 const stars = prog?.stars || 0
                 const acc =
                   prog?.totalQuestions > 0
@@ -202,7 +235,7 @@ function ParentCorner({
                     : null
                 return (
                   <div key={node.id} className="parent-node-row">
-                    <span className="p-node-badge">{node.badge}</span>
+                    <span className="p-node-badge">T{node.tier} {node.badge}</span>
                     <span className="p-node-name">{node.title}</span>
                     <span className="p-node-stars">
                       {'⭐'.repeat(stars)}
@@ -226,16 +259,16 @@ function ParentCorner({
               className="btn btn-pink btn-small"
               onClick={() => setConfirmReset(true)}
             >
-              Reset All Progress
+              Reset {profile.childName}’s Progress
             </button>
           ) : (
             <div className="reset-confirm-row">
-              <span>Are you sure you want to reset stars and stickers?</span>
+              <span>Reset stars and stickers for {profile.childName}?</span>
               <button
                 type="button"
                 className="btn btn-pink btn-small"
                 onClick={() => {
-                  onResetProgress()
+                  onResetProfileProgress()
                   setConfirmReset(false)
                 }}
               >

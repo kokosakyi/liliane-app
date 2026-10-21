@@ -14,6 +14,7 @@ import { playSfx, speakText, spellOutWord } from '../utils/soundManager'
 
 function SkillSession({
   nodeId,
+  profileId = 'default',
   isDailyPractice = false,
   mathFrontierId = 'math-1',
   readingFrontierId = 'read-1',
@@ -39,8 +40,8 @@ function SkillSession({
 
   const startNewRound = useCallback(() => {
     const batch = isDailyPractice
-      ? generateDailyPracticeBatch(mathFrontierId, readingFrontierId)
-      : generateNodeQuestions(nodeId, 6)
+      ? generateDailyPracticeBatch(mathFrontierId, readingFrontierId, profileId)
+      : generateNodeQuestions(nodeId, 6, profileId)
     setQuestions(batch)
     setCurrentIndex(0)
     setFirstTryCorrectCount(0)
@@ -54,7 +55,15 @@ function SkillSession({
         ? 'Daily Practice time! 6 fun questions to power up your streak!'
         : nodeMeta?.description || buddy.greeting,
     )
-  }, [isDailyPractice, mathFrontierId, readingFrontierId, nodeId, nodeMeta, buddy.greeting])
+  }, [
+    isDailyPractice,
+    mathFrontierId,
+    readingFrontierId,
+    nodeId,
+    profileId,
+    nodeMeta,
+    buddy.greeting,
+  ])
 
   useEffect(() => {
     startNewRound()
@@ -85,7 +94,7 @@ function SkillSession({
     } else {
       playSfx('wrong', soundEnabled)
       setHadWrongAttemptOnCurrent(true)
-      setShowHint(true) // Automatically show step-by-step hint on wrong answer
+      setShowHint(true)
       setBuddyMessage(currentQuestion.hint || 'Try again! Look at the visual clue.')
       setFeedback({ isCorrect: false })
     }
@@ -104,7 +113,6 @@ function SkillSession({
         setShowHint(false)
         setImageError(false)
       } else {
-        // Round finished!
         playSfx('fanfare', soundEnabled)
         if (isDailyPractice) {
           const summary = onCompleteDaily?.(updatedFirstTry, questions.length)
@@ -142,7 +150,6 @@ function SkillSession({
     return <div className="chalk-text">Preparing your adventure...</div>
   }
 
-  // Completion Celebration View
   if (sessionResult) {
     const { stars, firstTryCorrect, total, unlockedStickers = [], nextNode } = sessionResult
     return (
@@ -228,7 +235,11 @@ function SkillSession({
         </button>
 
         <div className="session-title-group">
-          {nodeMeta && <span className="kumon-badge">Level {nodeMeta.badge}</span>}
+          {nodeMeta && (
+            <span className="kumon-badge">
+              Tier {nodeMeta.tier} &bull; Level {nodeMeta.badge}
+            </span>
+          )}
           <h2 className="section-title">
             {isDailyPractice
               ? '⚡ Daily Practice'
@@ -280,6 +291,32 @@ function SkillSession({
             )}
 
             <MathVisuals question={currentQuestion} showHint={showHint} />
+          </div>
+        ) : currentQuestion.visualType === 'passage-card' ? (
+          <div className="reading-passage-card">
+            {currentQuestion.sceneImage && (
+              <img
+                src={currentQuestion.sceneImage}
+                alt={currentQuestion.passageTitle}
+                className="passage-scene-img"
+              />
+            )}
+            <div className="passage-body">
+              <div className="passage-title-row">
+                <h3 className="passage-title">{currentQuestion.passageTitle}</h3>
+                <button
+                  type="button"
+                  className="btn-icon-speaker"
+                  onClick={() =>
+                    speakText(`${currentQuestion.passageTitle}. ${currentQuestion.passageText}`)
+                  }
+                  title="Listen to story passage"
+                >
+                  🔊
+                </button>
+              </div>
+              <p className="passage-text">{currentQuestion.passageText}</p>
+            </div>
           </div>
         ) : (
           <div className="reading-question-stage">
@@ -357,7 +394,9 @@ function SkillSession({
               <button
                 key={idx}
                 type="button"
-                className="choice-btn"
+                className={`choice-btn ${
+                  String(choice).length > 8 ? 'choice-btn-text' : ''
+                }`}
                 onClick={() => handleAnswer(choice)}
                 disabled={feedback !== null}
               >
@@ -399,7 +438,6 @@ function SkillSession({
         compact
       />
 
-      {/* Celebration / Retry Feedback Overlay */}
       {feedback && (
         <Feedback isCorrect={feedback.isCorrect} onContinue={handleContinue} />
       )}

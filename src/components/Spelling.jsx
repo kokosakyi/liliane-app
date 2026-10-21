@@ -86,14 +86,56 @@ const WORD_BANK = [
   { word: 'house', category: 'Thing', emoji: '🏠' },
   { word: 'acorn', category: 'Nature', emoji: '🌰' },
   { word: 'tulip', category: 'Nature', emoji: '🌷' },
+  // ── 6-letter words (Grades 1–2) ──
+  { word: 'planet', category: 'Space', emoji: '🪐' },
+  { word: 'rocket', category: 'Space', emoji: '🚀' },
+  { word: 'monkey', category: 'Animal', emoji: '🐒' },
+  { word: 'turtle', category: 'Animal', emoji: '🐢' },
+  { word: 'dragon', category: 'Magic', emoji: '🐉' },
+  { word: 'castle', category: 'Thing', emoji: '🏰' },
+  { word: 'island', category: 'Nature', emoji: '🏝️' },
+  { word: 'banana', category: 'Food', emoji: '🍌' },
+  { word: 'guitar', category: 'Music', emoji: '🎸' },
+  { word: 'trophy', category: 'Thing', emoji: '🏆' },
+  { word: 'carrot', category: 'Food', emoji: '🥕' },
+  { word: 'anchor', category: 'Thing', emoji: '⚓' },
+  // ── 7-letter words (Grades 2–3) ──
+  { word: 'rainbow', category: 'Nature', emoji: '🌈' },
+  { word: 'dolphin', category: 'Animal', emoji: '🐬' },
+  { word: 'penguin', category: 'Animal', emoji: '🐧' },
+  { word: 'giraffe', category: 'Animal', emoji: '🦒' },
+  { word: 'octopus', category: 'Animal', emoji: '🐙' },
+  { word: 'volcano', category: 'Nature', emoji: '🌋' },
+  { word: 'cupcake', category: 'Food', emoji: '🧁' },
+  { word: 'compass', category: 'Thing', emoji: '🧭' },
+  { word: 'lantern', category: 'Thing', emoji: '🏮' },
+  { word: 'unicorn', category: 'Magic', emoji: '🦄' },
+  { word: 'pretzel', category: 'Food', emoji: '🥨' },
+  { word: 'snowman', category: 'Nature', emoji: '⛄' },
+  // ── 8-letter words (Grades 3–4) ──
+  { word: 'elephant', category: 'Animal', emoji: '🐘' },
+  { word: 'kangaroo', category: 'Animal', emoji: '🦘' },
+  { word: 'dinosaur', category: 'Science', emoji: '🦕' },
+  { word: 'squirrel', category: 'Animal', emoji: '🐿️' },
+  { word: 'flamingo', category: 'Animal', emoji: '🦩' },
+  { word: 'hedgehog', category: 'Animal', emoji: '🦔' },
+  { word: 'mushroom', category: 'Nature', emoji: '🍄' },
+  { word: 'umbrella', category: 'Thing', emoji: '☂️' },
+  { word: 'mountain', category: 'Nature', emoji: '🏔️' },
+  { word: 'broccoli', category: 'Food', emoji: '🥦' },
+  { word: 'scissors', category: 'Thing', emoji: '✂️' },
+  { word: 'backpack', category: 'Thing', emoji: '🎒' },
 ].map((entry) => ({ ...entry, image: emojiToTwemojiUrl(entry.emoji) }))
 
-const LENGTH_OPTIONS = [3, 4, 5]
+const LENGTH_OPTIONS = [3, 4, 5, 6, 7, 8]
 
 const PROMPTS = {
-  3: 'Three-letter starters',
-  4: 'Four-letter builders',
-  5: 'Five-letter challenge',
+  3: 'Three-letter starters (Pre-K)',
+  4: 'Four-letter builders (Kindergarten)',
+  5: 'Five-letter challenge (Grade 1)',
+  6: 'Six-letter explorers (Grade 2)',
+  7: 'Seven-letter spelling bee (Grade 3)',
+  8: 'Eight-letter champions (Grade 4)',
 }
 
 function shuffleArray(items) {
@@ -224,7 +266,10 @@ function Spelling({ onBack, soundEnabled = true, onEarnBonusStars }) {
                 : 'Nice effort! Try again and beat your score!'}
           </p>
           <div className="section-buttons" style={{ marginTop: '20px' }}>
-            <button className="btn btn-purple" onClick={() => startRound(selectedLength)}>
+            <button
+              className="btn btn-purple"
+              onClick={() => startRound(selectedLength)}
+            >
               Play Again
             </button>
             <button className="btn btn-back" onClick={onBack}>
@@ -322,7 +367,6 @@ function Spelling({ onBack, soundEnabled = true, onEarnBonusStars }) {
 
       {!result && (
         <>
-          {/* Tappable Scrambled Letter Tiles */}
           <div className="scrambled-bank">
             {bankTiles.map((tile) => {
               const isUsed = usedTileIds.includes(tile.id)
@@ -380,7 +424,9 @@ function Spelling({ onBack, soundEnabled = true, onEarnBonusStars }) {
 
       {result && (
         <div
-          className={`spelling-result ${result.isCorrect ? 'result-correct' : 'result-wrong'}`}
+          className={`spelling-result ${
+            result.isCorrect ? 'result-correct' : 'result-wrong'
+          }`}
         >
           <span className="result-icon">{result.isCorrect ? '🎉' : '💡'}</span>
           <span>

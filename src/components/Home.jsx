@@ -5,14 +5,14 @@ function Home({
   onGoToAdventure,
 }) {
   const difficultyLabels = {
-    1: 'Easy (0-5)',
-    2: 'Medium (0-10)',
-    3: 'Hard (0-20)',
+    1: 'Tier 1: Pre-K (0–5)',
+    2: 'Tier 2: Kinder (0–10)',
+    3: 'Tier 3: Gr 1–2 (0–50)',
+    4: 'Tier 4: Gr 3–4 (0–100)',
   }
 
   return (
     <div className="home">
-      {/* Decorative chalk drawings */}
       <span className="chalk-decoration top-left">⭐</span>
       <span className="chalk-decoration top-right">🌟</span>
       <span className="chalk-decoration bottom-left">✨</span>
@@ -20,14 +20,15 @@ function Home({
 
       <h1 className="title">📚 Free-Play Library</h1>
       <p className="subtitle chalk-text">
-        Pick any activity to practice freely & earn bonus stars!
+        Pick a difficulty tier and jump into any activity!
       </p>
 
-      {/* Difficulty selector for Math Free-Play */}
+      {/* 4-Tier Difficulty Selector for Free-Play */}
       <div className="difficulty-selector">
-        {[1, 2, 3].map((level) => (
+        {[1, 2, 3, 4].map((level) => (
           <button
             key={level}
+            type="button"
             className={`difficulty-btn ${difficulty === level ? 'active' : ''}`}
             onClick={() => onDifficultyChange(level)}
           >
@@ -39,6 +40,7 @@ function Home({
       {/* Section buttons */}
       <div className="section-buttons">
         <button
+          type="button"
           className="btn btn-yellow section-btn"
           onClick={() => onSelectSection('addition')}
         >
@@ -47,6 +49,7 @@ function Home({
         </button>
 
         <button
+          type="button"
           className="btn btn-pink section-btn"
           onClick={() => onSelectSection('subtraction')}
         >
@@ -55,6 +58,7 @@ function Home({
         </button>
 
         <button
+          type="button"
           className="btn btn-blue section-btn"
           onClick={() => onSelectSection('story')}
         >
@@ -63,14 +67,16 @@ function Home({
         </button>
 
         <button
+          type="button"
           className="btn btn-purple section-btn"
           onClick={() => onSelectSection('spelling')}
         >
           <span className="icon">🎤</span>
-          Spelling Jam
+          Spelling Jam (3–9 Letters)
         </button>
 
         <button
+          type="button"
           className="btn btn-green section-btn"
           onClick={() => onSelectSection('countries')}
         >
@@ -80,6 +86,7 @@ function Home({
 
         {onGoToAdventure && (
           <button
+            type="button"
             className="btn btn-back section-btn"
             onClick={onGoToAdventure}
           >

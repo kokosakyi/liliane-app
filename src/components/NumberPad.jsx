@@ -11,7 +11,7 @@ function NumberPad({ onSubmit, disabled = false, soundEnabled = true, questionKe
   const handleDigit = (digit) => {
     if (disabled) return
     playSfx('tap', soundEnabled)
-    setValue((prev) => (prev.length < 2 ? `${prev}${digit}` : prev))
+    setValue((prev) => (prev.length < 3 ? `${prev}${digit}` : prev))
   }
 
   const handleBackspace = () => {
@@ -30,7 +30,7 @@ function NumberPad({ onSubmit, disabled = false, soundEnabled = true, questionKe
       if (disabled) return
       if (e.key >= '0' && e.key <= '9') {
         e.preventDefault()
-        setValue((prev) => (prev.length < 2 ? `${prev}${e.key}` : prev))
+        setValue((prev) => (prev.length < 3 ? `${prev}${e.key}` : prev))
       } else if (e.key === 'Backspace') {
         e.preventDefault()
         setValue((prev) => prev.slice(0, -1))
