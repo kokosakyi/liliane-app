@@ -4,6 +4,7 @@ import Addition from './components/Addition'
 import Subtraction from './components/Subtraction'
 import StoryProblems from './components/StoryProblems'
 import Countries from './components/Countries'
+import Dinosaurs from './components/Dinosaurs'
 import Spelling from './components/Spelling'
 import AdventureMap from './components/AdventureMap'
 import SkillSession from './components/SkillSession'
@@ -285,6 +286,15 @@ function App() {
       case 'countries':
         return <Countries onBack={() => setCurrentView('library')} />
 
+      case 'dinosaurs':
+        return (
+          <Dinosaurs
+            soundEnabled={rootState.soundEnabled}
+            onEarnBonusStars={handleEarnBonusStars}
+            onBack={() => setCurrentView('library')}
+          />
+        )
+
       case 'spelling':
         return (
           <Spelling
@@ -310,6 +320,7 @@ function App() {
             }}
             onStartDailyPractice={() => setCurrentView('daily')}
             onOpenCountries={() => setCurrentView('countries')}
+            onOpenDinosaurs={() => setCurrentView('dinosaurs')}
           />
         )
     }
@@ -368,9 +379,15 @@ function App() {
             <button
               type="button"
               className={`hud-tab-btn ${
-                ['library', 'addition', 'subtraction', 'story', 'spelling', 'countries'].includes(
-                  currentView,
-                )
+                [
+                  'library',
+                  'addition',
+                  'subtraction',
+                  'story',
+                  'spelling',
+                  'countries',
+                  'dinosaurs',
+                ].includes(currentView)
                   ? 'active'
                   : ''
               }`}

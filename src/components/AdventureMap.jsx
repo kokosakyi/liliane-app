@@ -15,6 +15,7 @@ function AdventureMap({
   onSelectNode,
   onStartDailyPractice,
   onOpenCountries,
+  onOpenDinosaurs,
 }) {
   const [selectedTrack, setSelectedTrack] = useState('math') // 'math' | 'reading'
   const [showAllTiers, setShowAllTiers] = useState(false)
@@ -138,6 +139,20 @@ function AdventureMap({
           <span>🌍</span>
           <span>World Flags</span>
         </button>
+
+        {onOpenDinosaurs && (
+          <button
+            type="button"
+            className="track-tab-btn track-tab-dino"
+            onClick={() => {
+              playSfx('tap', soundEnabled)
+              onOpenDinosaurs()
+            }}
+          >
+            <span>🦖</span>
+            <span>Dinosaurs</span>
+          </button>
+        )}
 
         <button
           type="button"

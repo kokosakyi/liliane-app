@@ -84,6 +84,15 @@ function Home({
           Countries & Flags
         </button>
 
+        <button
+          type="button"
+          className="btn btn-orange section-btn"
+          onClick={() => onSelectSection('dinosaurs')}
+        >
+          <span className="icon">🦖</span>
+          Dinosaurs
+        </button>
+
         {onGoToAdventure && (
           <button
             type="button"
